@@ -48,7 +48,6 @@ public final class Constants {
 
     public static final double kWheelRadiusMeters = Units.inchesToMeters(1.9425);
     public static final double kWheelCOF = 1;
-    public static final DCMotor kMotor = new DCMotor(null, 7.09, );
     public static final double kDriveCurrentLimit = 20;
     public static final int kNumMotors = 1;
 }

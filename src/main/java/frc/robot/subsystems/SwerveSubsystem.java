@@ -30,9 +30,9 @@ import frc.robot.commands.ZeroOdometry;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathHolonomic;
+//import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.pathplanner.lib.path.PathPlannerPath;
-import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+//import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.RobotConfig;
@@ -91,7 +91,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private final ModuleConfig m_moduleConfig = new ModuleConfig(Constants.ModuleConstants.kWheelRadiusMeters, Constants.DriveConstants.kPhysicalMaxSpeedMetersPerSecond,
      Constants.ModuleConstants.kWheelCOF, Constants.ModuleConstants.kMotor, Constants.ModuleConstants.kDriveCurrentLimit, Constants.ModuleConstants.kNumMotors);
-    private final RobotConfig m_robotConfig = new RobotConfig()
 
     public SwerveSubsystem() {
         this.initialize();
@@ -142,31 +141,35 @@ public class SwerveSubsystem extends SubsystemBase {
         swerveTab.add(new ZeroOdometry(this));
 
 // Configure AutoBuilder last
-    AutoBuilder.configure(
-            this::getPose, // Robot pose supplier
-            this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-            this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-            this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-            new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
-                    1, //4.5, // Max module speed, in m/s
-                    0.5, // Drive base radius in meters. Distance from robot center to furthest module.
-                    new ReplanningConfig() // Default path replanning config. See the API for the options here
-            ),
-            () -> {
-              // Boolean supplier that controls when the path will be mirrored for the red alliance
-              // This will flip the path being followed to the red side of the field.
-              // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    try{
+        RobotConfig config = RobotConfig.fromGUISettings();
 
-              var alliance = DriverStation.getAlliance();
-              if (alliance.isPresent()) {
-                return alliance.get() == DriverStation.Alliance.Red;
-              }
-              return false;
-            },
-            this // Reference to this subsystem to set requirements
-    );
+    AutoBuilder.configure(
+    this::getPose, // Robot pose supplier
+    this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+    this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+    this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+    new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+            new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
+            new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
+            0.02 // Control loop length in seconds
+    ),
+        config,
+
+        ()->{
+    var alliance = DriverStation.getAlliance(); //Boolean supplier that checks which alliance the bot is on
+    if (alliance.isPresent()) {
+        return alliance.get() == DriverStation.Alliance.Red;
+    }
+    return false;
+},
+this
+);
+
+        
+    }catch(Exception e){
+      DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
+    }
 
 
     }
@@ -304,12 +307,10 @@ public class SwerveSubsystem extends SubsystemBase {
                 this::getPose, // Robot pose supplier
                 this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-                new HolonomicPathFollowerConfig( // HolonomicPathFollowerConfig, this should likely live in your Constants class
+                new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
                         new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
                         new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
-                        0.5, // Max module speed, in m/s
-                        0.4, // Drive base radius in meters. Distance from robot center to furthest module.
-                        new ReplanningConfig() // Default path replanning config. See the API for the options here
+                        0.02 // Control loop duration in seconds
                 ),
                 () -> {
                     // Boolean supplier that controls when the path will be mirrored for the red alliance
