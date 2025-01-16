@@ -20,6 +20,7 @@ import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.cscore.UsbCamera;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -277,12 +278,18 @@ public class RobotContainer {
     return pathfindingCommand;
   }
 
-  public Command makePathCommand(String pathName){
-      // Load the path you want to follow using its name in the GUI
-      PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+  public Command makePathCommand(String pathName) {
+    PathPlannerPath path = null;
+    // Load the path you want to follow using its name in the GUI
+    try {
+      path = PathPlannerPath.fromPathFile(pathName);
+    } catch (Exception e) {
+      DriverStation.reportError("Failed to load PathPlanner file:" + pathName, e.getStackTrace());
+    }
 
-      // Create a path following command using AutoBuilder. This will also trigger event markers.
-      return AutoBuilder.followPath(path);
+    // Create a path following command using AutoBuilder. This will also trigger
+    // event markers.
+    return AutoBuilder.followPath(path);
   };
 
   public void loadPreferences(){
