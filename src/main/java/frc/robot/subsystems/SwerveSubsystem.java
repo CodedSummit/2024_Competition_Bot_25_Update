@@ -30,8 +30,10 @@ import frc.robot.commands.ZeroOdometry;
 import com.ctre.phoenix.sensors.PigeonIMU;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.FollowPathCommand;
 //import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.DriveFeedforwards;
 //import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -88,9 +90,6 @@ public class SwerveSubsystem extends SubsystemBase {
     private GenericEntry dampenedSpeedFactor;
 
     private final Field2d m_field = new Field2d();
-
-    private final ModuleConfig m_moduleConfig = new ModuleConfig(Constants.ModuleConstants.kWheelRadiusMeters, Constants.DriveConstants.kPhysicalMaxSpeedMetersPerSecond,
-     Constants.ModuleConstants.kWheelCOF, Constants.ModuleConstants.kMotor, Constants.ModuleConstants.kDriveCurrentLimit, Constants.ModuleConstants.kNumMotors);
 
     public SwerveSubsystem() {
         this.initialize();
@@ -290,7 +289,7 @@ this
 
     }
 
-    public void driveRobotRelative(ChassisSpeeds chassisspeeds1) {
+    public void driveRobotRelative(ChassisSpeeds chassisspeeds1, DriveFeedforwards forwards) {
          // 5. Convert chassis speeds to individual module states
          SwerveModuleState[] moduleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(chassisspeeds1);
 
@@ -299,32 +298,42 @@ this
     }
 
     public Command followPathCommand(String pathName) {
-        PathPlannerPath path = PathPlannerPath.fromPathFile(pathName);
+        PathPlannerPath path = null;
+        Command command = null;
+        try{ 
+            path = PathPlannerPath.fromPathFile(pathName);
+        }catch (Exception e){
+            DriverStation.reportError("Failed to load PathPlanner file:" + pathName, e.getStackTrace());
+        }
+       
 
-        System.out.println("  Generating path for file:"+pathName);
-        return new FollowPathHolonomic(
+        try{
+            RobotConfig config = RobotConfig.fromGUISettings();
+            System.out.println("  Generating path for file:"+pathName);
+            command = new FollowPathCommand(
                 path,
                 this::getPose, // Robot pose supplier
                 this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
                 new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                        new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
-                        new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
-                        0.02 // Control loop duration in seconds
+                    new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
+                    new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
+                    0.02 // Control loop duration in seconds
                 ),
+                config,
                 () -> {
-                    // Boolean supplier that controls when the path will be mirrored for the red alliance
-                    // This will flip the path being followed to the red side of the field.
-                    // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
-
-                    var alliance = DriverStation.getAlliance();
+                    var alliance = DriverStation.getAlliance(); //Boolean supplier that checks which alliance the bot is on
                     if (alliance.isPresent()) {
-                        return alliance.get() == DriverStation.Alliance.Red;
+                         return alliance.get() == DriverStation.Alliance.Red;
                     }
                     return false;
                 },
                 this // Reference to this subsystem to set requirements
-        );
+            );
+        }    catch(Exception e){
+            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
+        }
+        return command;
     }
 
 }

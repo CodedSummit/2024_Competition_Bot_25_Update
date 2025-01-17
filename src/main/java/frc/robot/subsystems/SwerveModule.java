@@ -65,8 +65,8 @@ public class SwerveModule implements Sendable {
 
         turningEncoder = turningMotor.getEncoder();
 
-        turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad);
-        turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec);
+//        turningEncoder.setPositionConversionFactor(ModuleConstants.kTurningEncoderRot2Rad);
+//       turningEncoder.setVelocityConversionFactor(ModuleConstants.kTurningEncoderRPM2RadPerSec);
 
         turningPidController = new PIDController(ModuleConstants.kPTurning, 0, 0);
         turningPidController.setTolerance(0.0046*10);
@@ -85,8 +85,7 @@ public class SwerveModule implements Sendable {
     }
 
     public double getDrivePosition() {
-        return (driveTalonFX.getRotorPosition().getValue())
-            * ModuleConstants.kDriveEncoderRot2Meter;
+        return (driveTalonFX.getRotorPosition().getValue()).magnitude() * ModuleConstants.kDriveEncoderRot2Meter;
     }
 
     public double getTurningPosition() {

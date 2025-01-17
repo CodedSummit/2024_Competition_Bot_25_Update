@@ -8,6 +8,7 @@ import static edu.wpi.first.math.util.Units.degreesToRadians;
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.pathplanner.lib.config.RobotConfig;
 
 //import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 //import com.pathplanner.lib.util.PIDConstants;
@@ -45,11 +46,6 @@ public final class Constants {
     public static final double kDriveEncoderRPM2MeterPerSec = kDriveEncoderRot2Meter / 60;
     public static final double kTurningEncoderRPM2RadPerSec = kTurningEncoderRot2Rad / 60;
     public static final double kPTurning = 0.1;
-
-    public static final double kWheelRadiusMeters = Units.inchesToMeters(1.9425);
-    public static final double kWheelCOF = 1;
-    public static final double kDriveCurrentLimit = 20;
-    public static final int kNumMotors = 1;
 }
 
 public static final class DriveConstants {
@@ -139,6 +135,7 @@ public static final class AutoConstants {
           new TrapezoidProfile.Constraints(
                   kMaxAngularSpeedRadiansPerSecond,
                   kMaxAngularAccelerationRadiansPerSecondSquared);
+                  
 }
 
 public static final class VisionConstants {

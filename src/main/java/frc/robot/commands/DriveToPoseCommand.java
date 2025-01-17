@@ -133,7 +133,7 @@ public class DriveToPoseCommand extends Command {
     m_Omegalog.append(omegaSpeed);
     ChassisSpeeds goalSpeeds = new ChassisSpeeds(xSpeed, ySpeed, omegaSpeed);
     SmartDashboard.putData("Robot pose", this);
-    m_drivetrainSubsystem.driveRobotRelative(goalSpeeds);
+    m_drivetrainSubsystem.driveRobotRelative(goalSpeeds, null);
   }
   
   public boolean isFinished(){
