@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -22,13 +21,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.SetWheelAlignment;
 import frc.robot.commands.ZeroOdometry;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
 //import com.pathplanner.lib.commands.FollowPathHolonomic;
@@ -38,7 +35,6 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.config.ModuleConfig;
 
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveModule frontLeft = new SwerveModule(
@@ -106,32 +102,32 @@ public class SwerveSubsystem extends SubsystemBase {
 
         ShuffleboardTab swerveTab = Shuffleboard.getTab("Swerve");
         swerveTab.add("Front Left", frontLeft)
-            .withSize(2,2);
+                .withSize(2, 2);
         swerveTab.add("Front Right", frontRight)
-            .withSize(2,2);
+                .withSize(2, 2);
         swerveTab.add("Back Right", backRight)
-            .withSize(2,2)
-            .withPosition(0, 2);
+                .withSize(2, 2)
+                .withPosition(0, 2);
         swerveTab.add("Back Left", backLeft)
-            .withSize(2,2)
-            .withPosition(2, 2);
- 
+                .withSize(2, 2)
+                .withPosition(2, 2);
+
         swerveTab.add("Set Wheel Offsets", new SetWheelAlignment(this));
-        
+
         turboSpeedFactor = swerveTab.add("Turbo Percentage", 0.9)
-            .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
-            .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
-            .getEntry();
+                .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
+                .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+                .getEntry();
 
         normalSpeedFactor = swerveTab.add("Normal Percentage", .5)
-            .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
-            .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
-            .getEntry();
- 
+                .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
+                .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+                .getEntry();
+
         dampenedSpeedFactor = swerveTab.add("Dampened Percentage", .2)
-            .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
-            .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
-            .getEntry();
+                .withWidget(BuiltInWidgets.kNumberSlider) // specify the widget here
+                .withProperties(Map.of("min", 0, "max", 1)) // specify widget properties here
+                .getEntry();
 
         swerveTab.addDouble("Gyro data", () -> gyro.getYaw());
 
@@ -139,37 +135,36 @@ public class SwerveSubsystem extends SubsystemBase {
 
         swerveTab.add(new ZeroOdometry(this));
 
-// Configure AutoBuilder last
-    try{
-        RobotConfig config = RobotConfig.fromGUISettings();
+        // Configure AutoBuilder last
+        try {
+            RobotConfig config = RobotConfig.fromGUISettings();
 
-    AutoBuilder.configure(
-    this::getPose, // Robot pose supplier
-    this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
-    this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-    this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-    new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-            new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
-            0.02 // Control loop length in seconds
-    ),
-        config,
+            AutoBuilder.configure(
+                    this::getPose, // Robot pose supplier
+                    this::resetPose, // Method to reset odometry (will be called if your auto has a starting pose)
+                    this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+                    this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
+                    new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your
+                                                    // Constants class
+                            new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
+                            new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
+                            0.02 // Control loop length in seconds
+                    ),
+                    config,
 
-        ()->{
-    var alliance = DriverStation.getAlliance(); //Boolean supplier that checks which alliance the bot is on
-    if (alliance.isPresent()) {
-        return alliance.get() == DriverStation.Alliance.Red;
-    }
-    return false;
-},
-this
-);
+                    () -> {
+                        var alliance = DriverStation.getAlliance(); // Boolean supplier that checks which alliance the
+                                                                    // bot is on
+                        if (alliance.isPresent()) {
+                            return alliance.get() == DriverStation.Alliance.Red;
+                        }
+                        return false;
+                    },
+                    this);
 
-        
-    }catch(Exception e){
-      DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
-    }
-
+        } catch (Exception e) {
+            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
+        }
 
     }
 
@@ -300,39 +295,41 @@ this
     public Command followPathCommand(String pathName) {
         PathPlannerPath path = null;
         Command command = null;
-        try{ 
+        try {
             path = PathPlannerPath.fromPathFile(pathName);
-        }catch (Exception e){
+        } catch (Exception e) {
             DriverStation.reportError("Failed to load PathPlanner file:" + pathName, e.getStackTrace());
         }
-       
-
-        try{
-            RobotConfig config = RobotConfig.fromGUISettings();
-            System.out.println("  Generating path for file:"+pathName);
-            command = new FollowPathCommand(
+        RobotConfig config = null;
+        try {
+            config = RobotConfig.fromGUISettings();
+        } catch (Exception e) {
+            DriverStation.reportError("Failed to load RobotConfig settings from GUI", null);
+        }
+        System.out.println("  Generating path for file:" + pathName);
+        command = new FollowPathCommand(
                 path,
                 this::getPose, // Robot pose supplier
                 this::getRobotRelativeSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
                 this::driveRobotRelative, // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds
-                new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your Constants class
-                    new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
-                    new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
-                    0.02 // Control loop duration in seconds
+                new PPHolonomicDriveController( // HolonomicPathFollowerConfig, this should likely live in your
+                                                // Constants class
+                        new PIDConstants(2.0, 0.0, 0.0), // Translation PID constants
+                        new PIDConstants(2.0, 0.0, 0.0), // Rotation PID constants
+                        0.02 // Control loop duration in seconds
                 ),
                 config,
                 () -> {
-                    var alliance = DriverStation.getAlliance(); //Boolean supplier that checks which alliance the bot is on
+                    var alliance = DriverStation.getAlliance(); // Boolean supplier that checks which alliance the bot
+                                                                // is on
                     if (alliance.isPresent()) {
-                         return alliance.get() == DriverStation.Alliance.Red;
+                        return alliance.get() == DriverStation.Alliance.Red;
                     }
                     return false;
                 },
                 this // Reference to this subsystem to set requirements
-            );
-        }    catch(Exception e){
-            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", e.getStackTrace());
-        }
+        );
+
         return command;
     }
 
