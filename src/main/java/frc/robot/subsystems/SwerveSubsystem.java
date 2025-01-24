@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -22,24 +21,20 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.SetWheelAlignment;
 import frc.robot.commands.ZeroOdometry;
 
 import com.ctre.phoenix.sensors.PigeonIMU;
-import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.FollowPathCommand;
-//import com.pathplanner.lib.commands.FollowPathHolonomic;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.DriveFeedforwards;
-//import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
+import com.revrobotics.spark.SparkMax;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.config.RobotConfig;
-import com.pathplanner.lib.config.ModuleConfig;
-
+//The CAN Bus problem might be due to the SwerveModule class
 public class SwerveSubsystem extends SubsystemBase {
     private final SwerveModule frontLeft = new SwerveModule(
             DriveConstants.FrontLeft.DriveMotor,
@@ -217,7 +212,7 @@ this
     public Pose2d getPose() {
         return odometer.getEstimatedPosition();
     }
-    private void resetPose(Pose2d pose2d1) {
+    public void resetPose(Pose2d pose2d1) {
         resetOdometry(pose2d1);
     }
 

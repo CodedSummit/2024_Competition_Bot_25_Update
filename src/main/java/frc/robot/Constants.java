@@ -7,8 +7,7 @@ package frc.robot;
 import static edu.wpi.first.math.util.Units.degreesToRadians;
 import static edu.wpi.first.math.util.Units.inchesToMeters;
 
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.pathplanner.lib.config.RobotConfig;
+
 
 //import com.pathplanner.lib.util.HolonomicPathFollowerConfig;
 //import com.pathplanner.lib.util.PIDConstants;
@@ -21,7 +20,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 /**
@@ -148,7 +146,7 @@ public static final class VisionConstants {
      */
 
   public static final Transform3d kRobotToFrontCam = new Transform3d(new Translation3d(0.0, 0.0,inchesToMeters(17.0)), new Rotation3d(0.0, 0, 0));
-  public static final Transform2d kRobotToFrontCam2d = new Transform2d(new Translation2d(0.0, 0.0), new Rotation2d(0.0, 0));
+  public static final Transform2d kRobotToFrontCam2d = new Transform2d(new Translation2d(0.0, 0.0), new Rotation2d(0.0, 0.0));
   public static final Transform3d kRobotToBackCam = 
       new Transform3d(new Translation3d(0.0, 0.0,inchesToMeters(17.0)), 
       new Rotation3d(0.0, degreesToRadians(18.0), degreesToRadians(180.0)));
