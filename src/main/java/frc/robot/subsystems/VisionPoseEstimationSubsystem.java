@@ -37,7 +37,7 @@ public class VisionPoseEstimationSubsystem extends SubsystemBase {
   PhotonCamera m_backCamera = new PhotonCamera(VisionConstants.kBackCamName);
   PhotonCamera m_leftCamera = new PhotonCamera(VisionConstants.kLeftCamName);
   PhotonCamera m_rightCamera = new PhotonCamera(VisionConstants.kRightCamName);
-  AprilTagFieldLayout m_CompetitionAprilTagFieldLayout = AprilTagFields.k2024Crescendo.loadAprilTagLayoutField();
+  AprilTagFieldLayout m_CompetitionAprilTagFieldLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
   PhotonPoseEstimator m_backCamPhotonPoseEstimator=null;
   PhotonPoseEstimator m_leftCamPhotonPoseEstimator = null;
   PhotonPoseEstimator m_rightCamPhotonPoseEstimator = null;
